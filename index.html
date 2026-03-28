@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechFlow ERP - Suporte Inteligente</title>
+  <style>
+    :root {
+      --primary-color: #0056b3;
+      --bg-color: #f4f7f6;
+      --chat-bg: #ffffff;
+      --text-color: #333;
+      --bot-msg: #e9ecef;
+      --user-msg: #0056b3;
+      --user-text: #ffffff;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100dvh;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 450px;
+      height: 90vh;
+      max-height: 800px;
+      background: var(--chat-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+    }
+
+    .chat-header span {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: normal;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      line-height: 1.4;
+      font-size: 0.95rem;
+      word-wrap: break-word;
+    }
+
+    .message.bot {
+      background-color: var(--bot-msg);
+      color: var(--text-color);
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+    }
+
+    .message.user {
+      background-color: var(--user-msg);
+      color: var(--user-text);
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+    }
+
+    .typing-indicator {
+      font-size: 0.8rem;
+      color: #666;
+      align-self: flex-start;
+      display: none;
+      margin-bottom: 10px;
+    }
+
+    .chat-input-area {
+      padding: 15px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 10px;
+    }
+
+    #userInput {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    #userInput:focus {
+      border-color: var(--primary-color);
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #004494;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      TechFlow ERP
+      <span>Assistente Virtual Nível 1</span>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot">Olá! Sou o assistente virtual da TechFlow ERP. Como posso te ajudar hoje?</div>
+    </div>
+    
+    <div class="typing-indicator" id="typingIndicator">O assistente está digitando...</div>
+
+    <div class="chat-input-area">
+      <input type="text" id="userInput" placeholder="Digite sua dúvida..." autocomplete="off" onkeypress="handleKeyPress(event)">
+      <button id="sendBtn" onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+    // === ATENÇÃO: COLOQUE AQUI A SUA URL DO NGROK ===
+    // Exemplo: https://1234-abcd.ngrok-free.app/webhook/chat
+    const WEBHOOK_URL = "SUA_URL_DO_NGROK_AQUI"; 
+
+    const chatMessages = document.getElementById("chatMessages");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const typingIndicator = document.getElementById("typingIndicator");
+
+    function addMessage(text, sender) {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", sender);
+      msgDiv.innerText = text;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    }
+
+    async function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      // Adiciona mensagem do usuário na tela
+      addMessage(text, "user");
+      userInput.value = "";
+      
+      // Bloqueia input enquanto espera
+      userInput.disabled = true;
+      sendBtn.disabled = true;
+      typingIndicator.style.display = "block";
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      try {
+        // Envia o POST para o Webhook do n8n
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: text }) // Enviamos a chave 'message'
+        });
+
+        if (!response.ok) {
+          throw new Error("Erro na comunicação com a API");
+        }
+
+        // Recebe a resposta do n8n (o Respond to Webhook)
+        const data = await response.json();
+        
+        // Exibe a resposta do bot (ajuste 'data.response' conforme a chave que o n8n devolver)
+        addMessage(data.response || "Resposta recebida, mas campo não encontrado.", "bot");
+
+      } catch (error) {
+        console.error("Erro:", error);
+        addMessage("⚠️ Sistema indisponível no momento. Tente novamente mais tarde.", "bot");
+      } finally {
+        // Libera o input novamente
+        userInput.disabled = false;
+        sendBtn.disabled = false;
+        typingIndicator.style.display = "none";
+        userInput.focus();
+      }
+    }
+  </script>
+
+</body>
+</html>
