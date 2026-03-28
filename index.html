@@ -5,14 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TechFlow ERP - Suporte Inteligente</title>
   <style>
+    /* Definição das cores do Tema Escuro (Dark Mode) */
     :root {
-      --primary-color: #0056b3;
-      --bg-color: #f4f7f6;
-      --chat-bg: #ffffff;
-      --text-color: #333;
-      --bot-msg: #e9ecef;
-      --user-msg: #0056b3;
-      --user-text: #ffffff;
+      --primary-color: #3399ff; /* Azul vibrante para ação */
+      --bg-color: #121212;      /* Fundo profundo */
+      --chat-bg: #1e1e1e;       /* Fundo do contêiner do chat */
+      --text-color: #e0e0e0;    /* Texto claro principal */
+      --header-bg: #1a1a1a;     /* Fundo do cabeçalho */
+      --bot-msg-bg: #2a2a2a;    /* Balão da I.A. */
+      --bot-msg-text: #e0e0e0;  /* Texto da I.A. */
+      --user-msg-bg: #3399ff;   /* Balão do Usuário */
+      --user-msg-text: #ffffff; /* Texto do Usuário */
+      --input-bg: #2a2a2a;      /* Fundo do campo de texto */
+      --input-border: #444;    /* Borda do campo de texto */
     }
 
     body {
@@ -23,6 +28,7 @@
       justify-content: center;
       align-items: center;
       height: 100dvh;
+      color: var(--text-color);
     }
 
     .chat-container {
@@ -32,28 +38,35 @@
       max-height: 800px;
       background: var(--chat-bg);
       border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5); /* Sombra mais pesada para o dark mode */
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      border: 1px solid #333; /* Borda sutil */
     }
 
     .chat-header {
-      background-color: var(--primary-color);
+      background-color: var(--header-bg);
       color: white;
       padding: 20px;
       text-align: center;
-      font-weight: bold;
-      font-size: 1.2rem;
-      letter-spacing: 1px;
+      border-bottom: 1px solid #333;
     }
 
-    .chat-header span {
+    .chat-header .title {
+      font-weight: bold;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      color: var(--primary-color);
+    }
+
+    .chat-header span.subtitle {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: normal;
-      opacity: 0.8;
+      opacity: 0.7;
       margin-top: 4px;
+      color: #aaa;
     }
 
     .chat-messages {
@@ -63,78 +76,105 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
+      background-color: var(--chat-bg);
+    }
+
+    /* Estilização da barra de rolagem (Scrollbar) para o dark mode */
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background-color: #444;
+      border-radius: 3px;
     }
 
     .message {
-      max-width: 80%;
+      max-width: 85%;
       padding: 12px 16px;
-      border-radius: 8px;
-      line-height: 1.4;
+      border-radius: 12px;
+      line-height: 1.5;
       font-size: 0.95rem;
       word-wrap: break-word;
+      position: relative;
     }
 
     .message.bot {
-      background-color: var(--bot-msg);
-      color: var(--text-color);
+      background-color: var(--bot-msg-bg);
+      color: var(--bot-msg-text);
       align-self: flex-start;
       border-bottom-left-radius: 0;
     }
 
     .message.user {
-      background-color: var(--user-msg);
-      color: var(--user-text);
+      background-color: var(--user-msg-bg);
+      color: var(--user-msg-text);
       align-self: flex-end;
       border-bottom-right-radius: 0;
+      box-shadow: 0 4px 8px rgba(51, 153, 255, 0.3);
     }
 
     .typing-indicator {
       font-size: 0.8rem;
-      color: #666;
+      color: #888;
       align-self: flex-start;
       display: none;
+      margin-left: 20px;
       margin-bottom: 10px;
+      font-style: italic;
     }
 
     .chat-input-area {
       padding: 15px;
-      background: #fff;
-      border-top: 1px solid #eee;
+      background: var(--header-bg);
+      border-top: 1px solid #333;
       display: flex;
       gap: 10px;
     }
 
     #userInput {
       flex: 1;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
+      padding: 12px 16px;
+      border: 1px solid var(--input-border);
+      border-radius: 24px;
       outline: none;
       font-size: 1rem;
-      transition: border-color 0.3s;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: all 0.3s;
     }
 
     #userInput:focus {
       border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(51, 153, 255, 0.2);
+    }
+
+    #userInput::placeholder {
+      color: #666;
     }
 
     button {
       background-color: var(--primary-color);
       color: white;
       border: none;
-      padding: 0 20px;
-      border-radius: 20px;
+      padding: 0 24px;
+      border-radius: 24px;
       cursor: pointer;
       font-weight: bold;
-      transition: 0.3s;
+      font-size: 0.95rem;
+      transition: background-color 0.3s, transform 0.1s;
     }
 
     button:hover {
-      background-color: #004494;
+      background-color: #007bdd;
+    }
+
+    button:active {
+      transform: scale(0.97);
     }
 
     button:disabled {
-      background-color: #ccc;
+      background-color: #444;
+      color: #888;
       cursor: not-allowed;
     }
   </style>
@@ -143,26 +183,25 @@
 
   <div class="chat-container">
     <div class="chat-header">
-      TechFlow ERP
-      <span>Assistente Virtual Nível 1</span>
+      <div class="title">TechFlow ERP</div>
+      <span class="subtitle">Assistente Virtual Inteligente</span>
     </div>
 
     <div class="chat-messages" id="chatMessages">
-      <div class="message bot">Olá! Sou o assistente virtual da TechFlow ERP. Como posso te ajudar hoje?</div>
+      <div class="message bot">Olá! Sou o assistente de I.A. da TechFlow ERP. Estou aqui para te ajudar com dúvidas básicas ou fazer o transbordo para nossa equipe humana. Como posso te ajudar hoje?</div>
     </div>
     
-    <div class="typing-indicator" id="typingIndicator">O assistente está digitando...</div>
+    <div class="typing-indicator" id="typingIndicator">O assistente está pensando...</div>
 
     <div class="chat-input-area">
-      <input type="text" id="userInput" placeholder="Digite sua dúvida..." autocomplete="off" onkeypress="handleKeyPress(event)">
+      <input type="text" id="userInput" placeholder="Digite sua dúvida técnica..." autocomplete="off" onkeypress="handleKeyPress(event)">
       <button id="sendBtn" onclick="sendMessage()">Enviar</button>
     </div>
   </div>
 
   <script>
-    // === ATENÇÃO: COLOQUE AQUI A SUA URL DO NGROK ===
-    // Exemplo: https://1234-abcd.ngrok-free.app/webhook/chat
-    const WEBHOOK_URL = "SUA_URL_DO_NGROK_AQUI"; 
+    // URL do webhook do n8n (via ngrok)
+    const WEBHOOK_URL = "https://osteitic-sportily-mariana.ngrok-free.dev/webhook/chat"; 
 
     const chatMessages = document.getElementById("chatMessages");
     const userInput = document.getElementById("userInput");
@@ -174,7 +213,7 @@
       msgDiv.classList.add("message", sender);
       msgDiv.innerText = text;
       chatMessages.appendChild(msgDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
     }
 
     function handleKeyPress(event) {
@@ -187,41 +226,41 @@
       const text = userInput.value.trim();
       if (!text) return;
 
-      // Adiciona mensagem do usuário na tela
+      // 1. Adiciona a mensagem do usuário na tela e limpa o input
       addMessage(text, "user");
       userInput.value = "";
       
-      // Bloqueia input enquanto espera
+      // 2. Estado de Carregamento (UX)
       userInput.disabled = true;
       sendBtn.disabled = true;
       typingIndicator.style.display = "block";
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
       try {
-        // Envia o POST para o Webhook do n8n
+        // 3. Envia o POST para a API do n8n via ngrok
         const response = await fetch(WEBHOOK_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ message: text }) // Enviamos a chave 'message'
+          body: JSON.stringify({ message: text }) // JSON padronizado
         });
 
         if (!response.ok) {
-          throw new Error("Erro na comunicação com a API");
+          throw new Error(`Erro na rede: ${response.status} ${response.statusText}`);
         }
 
-        // Recebe a resposta do n8n (o Respond to Webhook)
+        // 4. Recebe o JSON de resposta (do nó 'Respond to Webhook')
         const data = await response.json();
         
-        // Exibe a resposta do bot (ajuste 'data.response' conforme a chave que o n8n devolver)
-        addMessage(data.response || "Resposta recebida, mas campo não encontrado.", "bot");
+        // 5. Exibe a resposta da I.A. na tela (usando a chave 'response')
+        addMessage(data.response || "Recebi uma resposta vazia do servidor.", "bot");
 
       } catch (error) {
-        console.error("Erro:", error);
-        addMessage("⚠️ Sistema indisponível no momento. Tente novamente mais tarde.", "bot");
+        console.error("Erro completo da requisição:", error);
+        addMessage("⚠️ Desculpe, estou com dificuldades técnica para me conectar ao servidor do n8n agora. Verifique se o ngrok está rodando na sua máquina.", "bot");
       } finally {
-        // Libera o input novamente
+        // 6. Restaura o estado do input para o usuário continuar
         userInput.disabled = false;
         sendBtn.disabled = false;
         typingIndicator.style.display = "none";
